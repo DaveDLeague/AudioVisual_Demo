@@ -6,6 +6,7 @@
 #include "OpenAL/alc.h"
 
 #include <stdio.h>
+#include <math.h>
 
 struct WaveFile {
     char chunkID[4];
@@ -116,12 +117,37 @@ int main(int argc, char** argv){
     alGenBuffers(1, &buffer);
     alGenSources(1, &source);
 
-    alBufferData(buffer, AL_FORMAT_STEREO16, wf.data, wf.subChunk2Size, wf.byteRate);
+    alBufferData(buffer, AL_FORMAT_STEREO16, wf.data, wf.subChunk2Size, wf.sampleRate);
     alSourcei(source, AL_BUFFER, buffer);
 
-    alSourcePlay(source);
+    SDL_Window* window = SDL_CreateWindow("AV DEMO", 100, 100, 500, 500, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(window);
 
-    getchar();
+    glewInit();
+    glClearColor(0, 1, 0, 1);
+
+    SDL_Event event;
+    bool running = true;
+    while(running){
+        while(SDL_PollEvent(&event)){
+            switch(event.type){
+                case SDL_KEYDOWN:{
+                    if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE){
+                        running = false;
+                    }else if(event.key.keysym.scancode == SDL_SCANCODE_RETURN){
+                        alSourcePlay(source);
+                    }
+                } 
+                break;
+                case SDL_KEYUP: break;
+                case SDL_QUIT: running = false;
+                break;
+            }
+        }
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        SDL_GL_SwapWindow(window);
+    }
 
     alSourceStop(source);
 
@@ -131,33 +157,6 @@ int main(int argc, char** argv){
     alcDestroyContext(audioContext);
     alcCloseDevice(device);
 
-    // SDL_Window* window = SDL_CreateWindow("AV DEMO", 100, 100, 500, 500, SDL_WINDOW_OPENGL);
-    // SDL_GLContext context = SDL_GL_CreateContext(window);
 
-    // glewInit();
-    // glClearColor(0, 1, 0, 1);
-
-    // SDL_Event event;
-    // bool running = true;
-    // while(running){
-    //     while(SDL_PollEvent(&event)){
-    //         switch(event.type){
-    //             case SDL_KEYDOWN:{
-    //                 if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE){
-    //                     running = false;
-    //                 }
-    //             } 
-    //             break;
-    //             case SDL_KEYUP: break;
-    //             case SDL_QUIT: running = false;
-    //             break;
-    //         }
-    //     }
-    //     glClear(GL_COLOR_BUFFER_BIT);
-
-    //     SDL_GL_SwapWindow(window);
-    // }
-
-    
     return 0;
 }

@@ -1,0 +1,1 @@
+clang++ -o build/osx/av_demo main.cpp -I include -L libs/osx -lSDL2 -lglew -framework Cocoa -framework Metal -framework MetalKit -framework IOKit -framework Carbon -framework ForceFeedback -liconv -framework OpenAL -framework AVKit -framework CoreVideo -framework AudioToolbox -framework CoreAudio -framework OpenGL 

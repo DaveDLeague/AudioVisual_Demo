@@ -6,12 +6,12 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "build",
+            "command": "sh build_osx.sh",
         },
         {
             "label": "run",
             "type": "shell",
-            "command": "cd build/windows && av_demo",
+            "command": "./build/osx/av_demo",
         }
     ]
 }
