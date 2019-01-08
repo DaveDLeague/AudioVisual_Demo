@@ -48,7 +48,7 @@ void printWaveFile(WaveFile file){
 
 int main(int argc, char** argv){
 
-    SDL_RWops *file = SDL_RWFromFile("../../sound.wav", "rb");
+    SDL_RWops *file = SDL_RWFromFile("../../snare.wav", "rb");
     long size = SDL_RWsize(file);
     char* data = new char[size];
     SDL_RWread(file, data, 1, size);
@@ -103,10 +103,23 @@ int main(int argc, char** argv){
     wf.subChunk2Size = *(unsigned int*)fileptr;
     fileptr += 4;
 
+    char* iptr = fileptr;
+
     wf.data = new char[wf.subChunk2Size];
-    for(int i = 0; i < wf.subChunk2Size; i++){
-        wf.data[i] = *fileptr++;
+    if(wf.bitsPerSample == 24){
+        for(int i = 0; i < wf.subChunk2Size / 3; i += 2){
+            int num = *(int*)iptr / 256;
+            iptr += 3;
+            wf.data[i] = num << 8;
+            wf.data[i + 1] = num >> 8;
+        }
+    }else{
+        for(int i = 0; i < wf.subChunk2Size; i++){
+            wf.data[i] = *fileptr++;
+        }
     }
+    
+    
 
     printWaveFile(wf);
 
