@@ -8,11 +8,13 @@
 #include <stdio.h>
 #include <math.h>
 
+#define PAD 1095761920
+
 struct WaveFile {
-    char chunkID[4];
+    unsigned int chunkID;
     unsigned int chunkSize;
-    char format[4];
-    char subChunk1ID[4];
+    unsigned int format;
+    unsigned int subChunk1ID;
     unsigned int subChunk1Size;
     unsigned short audioFormat;
     unsigned short numChannels;
@@ -20,16 +22,16 @@ struct WaveFile {
     unsigned int byteRate;
     unsigned short blockAlign;
     unsigned short bitsPerSample;
-    char subChunk2ID[4];
+    unsigned int subChunk2ID;
     unsigned int subChunk2Size;
     char* data;
 };
 
 void printWaveFile(WaveFile file){
-    printf("Chunk ID: %c%c%c%c\n", file.chunkID[0], file.chunkID[1], file.chunkID[2], file.chunkID[3]);
+    printf("Chunk ID: %c%c%c%c\n", file.chunkID, file.chunkID >> 8, file.chunkID >> 16, file.chunkID >> 24);
     printf("Chunk Size: %u\n", file.chunkSize);
-    printf("Format: %c%c%c%c\n", file.format[0], file.format[1], file.format[2], file.format[3]);
-    printf("Sub Chunk 1 ID:  %c%c%c%c\n", file.subChunk1ID[0], file.subChunk1ID[1], file.subChunk1ID[2], file.subChunk1ID[3]);
+    printf("Format: %c%c%c%c\n", file.format, file.format >> 8, file.format >> 16, file.format >> 24);
+    printf("Sub Chunk 1 ID:  %c%c%c%c\n", file.subChunk1ID, file.subChunk1ID >> 8, file.subChunk1ID >> 16, file.subChunk1ID >> 24);
     printf("Sub Chunk 1 Size: %u\n", file.subChunk1Size);
     printf("Audio Format: %u\n", file.audioFormat);
     printf("Num Channels: %u\n", file.numChannels);
@@ -37,7 +39,7 @@ void printWaveFile(WaveFile file){
     printf("Byte Rate: %u\n", file.byteRate);
     printf("Block Align: %u\n", file.blockAlign);
     printf("Bits Per Sample: %u\n", file.bitsPerSample);
-    printf("Sub Chunk 2 ID:  %c%c%c%c\n", file.subChunk2ID[0], file.subChunk2ID[1], file.subChunk2ID[2], file.subChunk2ID[3]);
+    printf("Sub Chunk 2 ID:  %c%c%c%c\n", file.subChunk2ID, file.subChunk2ID >> 8, file.subChunk2ID >> 16, file.subChunk2ID >> 24);
     printf("Sub Chunk 2 Size: %u\n", file.subChunk2Size);
 
     printf("Data: \n");
@@ -48,7 +50,7 @@ void printWaveFile(WaveFile file){
 
 int main(int argc, char** argv){
 
-    SDL_RWops *file = SDL_RWFromFile("../../snare.wav", "rb");
+    SDL_RWops *file = SDL_RWFromFile("../../button.wav", "rb");
     long size = SDL_RWsize(file);
     char* data = new char[size];
     SDL_RWread(file, data, 1, size);
@@ -56,23 +58,17 @@ int main(int argc, char** argv){
 
     char* fileptr = data;
     WaveFile wf;
-    wf.chunkID[0] = *fileptr++;
-    wf.chunkID[1] = *fileptr++;
-    wf.chunkID[2] = *fileptr++;
-    wf.chunkID[3] = *fileptr++;
+    wf.chunkID = *(unsigned int*)fileptr;
+    fileptr += 4;
 
     wf.chunkSize = *(unsigned int*)fileptr;
     fileptr += 4;
 
-    wf.format[0] = *fileptr++;
-    wf.format[1] = *fileptr++;
-    wf.format[2] = *fileptr++;
-    wf.format[3] = *fileptr++;
+    wf.format = *(unsigned int*)fileptr;
+    fileptr += 4;
 
-    wf.subChunk1ID[0] = *fileptr++;
-    wf.subChunk1ID[1] = *fileptr++;
-    wf.subChunk1ID[2] = *fileptr++;
-    wf.subChunk1ID[3] = *fileptr++;
+    wf.subChunk1ID = *(unsigned int*)fileptr;
+    fileptr += 4;
 
     wf.subChunk1Size = *(unsigned int*)fileptr;
     fileptr += 4;
@@ -95,10 +91,21 @@ int main(int argc, char** argv){
     wf.bitsPerSample = *(unsigned short*)fileptr;
     fileptr += 2;
 
-    wf.subChunk2ID[0] = *fileptr++;
-    wf.subChunk2ID[1] = *fileptr++;
-    wf.subChunk2ID[2] = *fileptr++;
-    wf.subChunk2ID[3] = *fileptr++;
+    wf.subChunk2ID = *(unsigned int*)fileptr;
+    fileptr += 4;
+
+    while(wf.subChunk2ID != 'atad'){
+        if(wf.subChunk2ID == PAD){
+           fileptr += 4;
+        }
+        unsigned int v = *(unsigned int*)fileptr;
+        fileptr += 4;
+        printf("v: %u\n", v);
+        fileptr += v;
+        wf.subChunk2ID = *(unsigned int*)fileptr;
+        fileptr += 4;
+    }
+    
 
     wf.subChunk2Size = *(unsigned int*)fileptr;
     fileptr += 4;
@@ -118,8 +125,6 @@ int main(int argc, char** argv){
             wf.data[i] = *fileptr++;
         }
     }
-    
-    
 
     printWaveFile(wf);
 
