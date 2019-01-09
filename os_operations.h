@@ -43,20 +43,18 @@ void swapWindowBuffer(Window* win){
 }
 
 void deleteWindow(Window* win){
-    SDL_GL_DeleteContext((SDL_GLContext)win->graphicsContext);
+    SDL_GL_DeleteContext(win->graphicsContext);
     SDL_DestroyWindow((SDL_Window*)win->window);
 }
 
 Window createWindow(s8* title, u32 startX, u32 startY, u32 width, u32 height){
-    SDL_Window* window = SDL_CreateWindow("AV DEMO", startX, startY, width, height, SDL_WINDOW_OPENGL);
-    SDL_GLContext context = SDL_GL_CreateContext(window);
+    Window win;
+    win.window = (void*)SDL_CreateWindow("AV DEMO", startX, startY, width, height, SDL_WINDOW_OPENGL);
+    win.graphicsContext = SDL_GL_CreateContext((SDL_Window*)win.window);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-    Window win;
     win.closeRequested = false;
-    win.window = (void*)window;
-    win.graphicsContext = (void*)context; 
     return win;
 }

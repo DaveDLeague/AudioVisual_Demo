@@ -9,13 +9,32 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+s8* vs = " \
+#version 330 core\n \
+attribute vec3 position; \
+void main(){ \
+    gl_Position = vec4(position, 1); \
+} \
+";
+
+s8* fs = " \
+#version 330 core\n \
+out vec4 pixelColor; \
+void main(){ \
+    pixelColor = vec4(1, 0.5, 0, 1); \
+} \
+";
+
 int main(int argc, char** argv){
     Window win = createWindow("AV Demo", 100, 100, WIDTH, HEIGHT);
 
     initializeGLRenderer();
     setClearColor(0, 0.5, 1, 1);
 
-    bool running = true;
+    compileShaderVF(vs, fs);
+
+    
+
     while(!win.closeRequested){
         updateWindowEvents(&win);
         clearColorBuffer();

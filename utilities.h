@@ -10,3 +10,6 @@
 #define u64 unsigned long
 #define f32 float
 #define f64 double
+
+#include <stdio.h>
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
