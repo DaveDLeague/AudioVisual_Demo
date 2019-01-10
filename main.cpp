@@ -11,8 +11,10 @@ const s8* vs = " \
 #version 410 core\n \
 in vec3 position; \
 in vec2 texCoords; \
+out vec2 tCrds; \
 uniform mat4 projectionMatrix; \
 void main(){ \
+    tCrds = texCoords; \
     gl_Position = projectionMatrix * vec4(position, 1); \
 } \
 ";
@@ -20,9 +22,11 @@ void main(){ \
 const s8* fs = " \
 #version 410 core\n \
 out vec4 pixelColor; \
+in vec2 tCrds; \
 uniform sampler2D sampler; \
 void main(){ \
-    pixelColor =vec4(1, 0.5, 0, 1); \n\
+    vec4 color = texture(sampler, tCrds); \
+    pixelColor = color; \n\
 } \
 ";
 
