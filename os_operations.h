@@ -1,5 +1,7 @@
 #include "SDL2/SDL.h"
 
+static bool keyboardInputs[256];
+
 struct Window {
     void* window;
     void* graphicsContext;
@@ -26,12 +28,11 @@ void updateWindowEvents(Window* win){
     while(SDL_PollEvent(&event)){
         switch(event.type){
             case SDL_KEYDOWN:{
-                if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE){
-                    win->closeRequested = true;
-                }
-            } 
-            break;
-            case SDL_KEYUP: break;
+                keyboardInputs[event.key.keysym.scancode] = true;
+            } break;
+            case SDL_KEYUP:{
+                keyboardInputs[event.key.keysym.scancode] = false;
+            } break;
             case SDL_QUIT: win->closeRequested = true;
             break;
         }
