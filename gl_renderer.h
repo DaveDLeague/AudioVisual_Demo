@@ -129,34 +129,61 @@ void bindIndexBuffer(Buffer* b){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, b->id);
 }
 
+Texture generateTextureWidthData(u8* data, u32 width, u32 height){
+    Texture t;
+    glGenTextures(1, &t.id);
+    glBindTexture(GL_TEXTURE_2D, t.id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    return t;
+}
+
+void bindTexture(Texture* t){
+    glBindTexture(GL_TEXTURE_2D, t->id);
+}
+
 VertexAttributeDescriptor generateVertexAttributeDescriptor(u32 totalAttributes, VertexAttributeType* vaTypes){
     VertexAttributeDescriptor vad;
     glGenVertexArrays(1, &vad.id);
     glBindVertexArray(vad.id);
+    u64 offset = 0;
+    u64 stride = 0;
     for(int i = 0; i < totalAttributes; i++){
-        u64 offset = 0;
+        switch(vaTypes[i]){
+            case FLOAT : stride += sizeof(f32); break;
+            case FLOAT2 : stride += sizeof(f32) * 2; break;
+            case FLOAT3 : stride += sizeof(f32) * 3; break;
+            case FLOAT4 : stride += sizeof(f32) * 4; break;
+            case MATRIX4: break;
+        }
+    }
+
+    for(int i = 0; i < totalAttributes; i++){
         switch(vaTypes[i]){
             case FLOAT:{
                 u32 sz = sizeof(f32);
-                glVertexAttribPointer(i, 1, GL_FLOAT, GL_FALSE, sz, (const void*)offset);
+                glVertexAttribPointer(i, 1, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
                 offset += sz;
                 break;
             }
             case FLOAT2:{
                 u32 sz = sizeof(f32) * 2;
-                glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, sz, (const void*)offset);
+                glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
                 offset += sz;
                 break;
             }
             case FLOAT3:{
                 u32 sz = sizeof(f32) * 3;
-                glVertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, sz, (const void*)offset);
+                glVertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
                 offset += sz;
                 break;
             }
             case FLOAT4:{
                 u32 sz = sizeof(f32) * 4;
-                glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, sz, (const void*)offset);
+                glVertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, stride, (const void*)offset);
                 offset += sz;
                 break;
             }
