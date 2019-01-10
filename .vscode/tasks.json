@@ -12,6 +12,16 @@
             "label": "run",
             "type": "shell",
             "command": "cd build/windows && av_demo",
+        },
+        {
+            "label": "run_osx",
+            "type": "shell",
+            "command": "./build/osx/av_demo",
+        },
+        {
+            "label": "build_osx",
+            "type": "shell",
+            "command": "sh build_osx.sh",
         }
     ]
 }

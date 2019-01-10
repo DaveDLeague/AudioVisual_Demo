@@ -6,7 +6,7 @@ struct Window {
     bool closeRequested;
 };
 
-void loadDataFromFile(s8* fileName, s8** data, u64* fileSize){
+void loadDataFromFile(const s8* fileName, s8** data, u64* fileSize){
     SDL_RWops *file = SDL_RWFromFile(fileName, "rb");
     *fileSize = SDL_RWsize(file);
     *data = new s8[*fileSize];
@@ -47,13 +47,13 @@ void deleteWindow(Window* win){
     SDL_DestroyWindow((SDL_Window*)win->window);
 }
 
-Window createWindow(s8* title, u32 startX, u32 startY, u32 width, u32 height){
+Window createWindow(const s8* title, u32 startX, u32 startY, u32 width, u32 height){
     Window win;
     win.window = (void*)SDL_CreateWindow("AV DEMO", startX, startY, width, height, SDL_WINDOW_OPENGL);
-    win.graphicsContext = SDL_GL_CreateContext((SDL_Window*)win.window);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    win.graphicsContext = SDL_GL_CreateContext((SDL_Window*)win.window);
 
     win.closeRequested = false;
     return win;
