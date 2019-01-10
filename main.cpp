@@ -9,13 +9,13 @@
 
 const s8* vs = " \
 #version 410 core\n \
-in vec3 position; \
-in vec2 texCoords; \
+layout(location = 0) in vec3 position; \
+layout(location = 1) in vec2 texCoords; \
 out vec2 tCrds; \
 uniform mat4 projectionMatrix; \
 void main(){ \
-    tCrds = texCoords; \
-    gl_Position = projectionMatrix * vec4(position, 1); \
+    tCrds = texCoords; \n\
+    gl_Position = vec4(position, 1); \
 } \
 ";
 
@@ -25,7 +25,7 @@ out vec4 pixelColor; \
 in vec2 tCrds; \
 uniform sampler2D sampler; \
 void main(){ \
-    vec4 color = texture(sampler, tCrds); \
+    vec4 color = texture(sampler, tCrds);\n \
     pixelColor = color; \n\
 } \
 ";
@@ -55,11 +55,13 @@ int main(int argc, char** argv){
         0, 1, 2
     };
 
+
     Buffer b = generateVertexBufferWithData(vertices, sizeof(vertices));
+    
     VertexAttributeType vats[] = { FLOAT3, FLOAT2 };
     VertexAttributeDescriptor vad = generateVertexAttributeDescriptor(2, vats);
-
     Buffer b2 = generateIndexBufferWithData(indices, sizeof(indices));
+
 
     Texture t = generateTextureWidthData(texture, 2, 2);
 
@@ -72,7 +74,7 @@ int main(int argc, char** argv){
     while(!win.closeRequested){
         updateWindowEvents(&win);
         clearColorBuffer();
-
+        
         drawIndices(TRIANGLES, 0, 3, U8);
         swapWindowBuffer(&win);
     }
