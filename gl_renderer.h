@@ -218,6 +218,7 @@ void drawIndices(RenderType renderType, u64 bufferOffset, u32 count, IndexSize i
 }
 
 void initializeGLRenderer(){
+    glewExperimental = true;
     glewInit();
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);

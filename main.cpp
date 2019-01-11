@@ -33,7 +33,7 @@ void main(){ \
 ";
 
 int main(int argc, char** argv){
-    Window win = createWindow("AV Demo", 100, 100, WIDTH, HEIGHT);
+    Window win = createWindow("AV Demo", 50, 50, WIDTH, HEIGHT);
 
     initializeGLRenderer();
 
@@ -46,16 +46,6 @@ int main(int argc, char** argv){
     u8 texture[] = {
         0, 0, 255, 255, 255, 0, 0, 255,
         255, 0, 0, 255, 0, 0, 255, 255
-    };
-
-    f32 vertices[] = {
-        -0.5, -0.5, 0.0,  0, 0,
-         0.0,  0.5, 0.0,  0.5, 1,
-         0.5, -0.5, 0.0,  1, 0
-    };
-
-    u8 indices[] = {
-        0, 1, 2
     };
 
     f32* cVerts;
@@ -87,12 +77,12 @@ int main(int argc, char** argv){
     s32 projMatId = getUniformId(&shader, "projectionMatrix");
     setUniformValueMatrix4(projMatId, &projectionView);
 
-    f32 cameraMoveSpeed = 0.01;
-    f32 cameraRotateSpeed = 0.001;
+    f32 cameraMoveSpeed = 0.1;
+    f32 cameraRotateSpeed = 0.01;
 
     while(!win.closeRequested){
         updateWindowEvents(&win);
-        clearColorBuffer();
+        clearColorBuffer(); 
         
         camera.position -= camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_W];
         camera.position += camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_S];
@@ -123,10 +113,13 @@ int main(int argc, char** argv){
         camera.forward = newForward;
 
         projectionView = multiply(&camera.projection, &view);
+        
         setUniformValueMatrix4(projMatId, &projectionView);
 
-        win.closeRequested = keyboardInputs[SDL_SCANCODE_ESCAPE];
-
+        if(keyboardInputs[SDL_SCANCODE_ESCAPE]){
+            win.closeRequested = true;
+        }
+        
         drawIndices(TRIANGLES, 0, 36, U16);
         swapWindowBuffer(&win);
     }
