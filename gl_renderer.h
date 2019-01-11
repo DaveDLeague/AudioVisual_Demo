@@ -105,6 +105,14 @@ void setClearColor(f32 r, f32 g, f32 b, f32 a){
     glClearColor(r, g, b, a);
 }
 
+void setBackfaceCulling(bool mode){
+    if(mode){
+        glEnable(GL_CULL_FACE);
+    }else{
+        glDisable(GL_CULL_FACE);
+    }
+}
+
 Buffer generateVertexBufferWithData(void* vertexData, u32 vertexDataSize){
     Buffer b;
     glGenBuffers(1, &b.id);
@@ -211,4 +219,6 @@ void drawIndices(RenderType renderType, u64 bufferOffset, u32 count, IndexSize i
 
 void initializeGLRenderer(){
     glewInit();
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
 }

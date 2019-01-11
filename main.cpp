@@ -1,5 +1,6 @@
 #include "utilities.h"
 #include "graphics_math.h"
+#include "geometry_generator.h"
 #include "graphics_utilities.h"
 #include "os_operations.h"
 #include "gl_renderer.h"
@@ -37,6 +38,7 @@ int main(int argc, char** argv){
     initializeGLRenderer();
 
     setClearColor(0, 0.5, 1, 1);
+    setBackfaceCulling(true);
 
     Shader shader = compileShaderVF(vs, fs);
     bindShader(&shader);
@@ -56,12 +58,16 @@ int main(int argc, char** argv){
         0, 1, 2
     };
 
+    f32* cVerts;
+    u16* cInds;
+    u32 cvCt, ciCt;
+    generateCubeVerticesWithTexture(&cVerts, &cvCt, &cInds, &ciCt, 3);
 
-    Buffer b = generateVertexBufferWithData(vertices, sizeof(vertices));
+    Buffer b = generateVertexBufferWithData(cVerts, sizeof(f32) * cvCt * 5);
     
     VertexAttributeType vats[] = { FLOAT3, FLOAT2 };
     VertexAttributeDescriptor vad = generateVertexAttributeDescriptor(2, vats);
-    Buffer b2 = generateIndexBufferWithData(indices, sizeof(indices));
+    Buffer b2 = generateIndexBufferWithData(cInds, sizeof(u16) * ciCt);
 
     Texture t = generateTextureWidthData(texture, 2, 2);
 
@@ -121,7 +127,7 @@ int main(int argc, char** argv){
 
         win.closeRequested = keyboardInputs[SDL_SCANCODE_ESCAPE];
 
-        drawIndices(TRIANGLES, 0, 3, U8);
+        drawIndices(TRIANGLES, 0, 36, U16);
         swapWindowBuffer(&win);
     }
 
