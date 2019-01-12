@@ -101,6 +101,22 @@ void clearColorBuffer(){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
+void setDepthTesting(bool test){
+    if(test){
+        glEnable(GL_DEPTH_TEST);
+    }else{
+        glDisable(GL_DEPTH_TEST);
+    }
+}
+
+void clearDepthBuffer(){
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void clearColorAndDepthBuffer(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void setClearColor(f32 r, f32 g, f32 b, f32 a){
     glClearColor(r, g, b, a);
 }

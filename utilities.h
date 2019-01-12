@@ -3,7 +3,7 @@
 #define s8 char
 #define s16 short
 #define s32 int
-#define u64 unsigned long
+#define s64 long
 #define u8 unsigned char
 #define u16 unsigned short
 #define u32 unsigned int
@@ -13,3 +13,13 @@
 
 #include <stdio.h>
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
+
+u32 xorshift32(u32 *state)
+{
+	u32 x = *state;
+	x ^= x << 13;
+	x ^= x >> 17;
+	x ^= x << 5;
+	*state = x;
+	return x;
+}

@@ -167,9 +167,9 @@ void rotate(Quaternion* q, Vector3 angle, f32 amount){
 }
 
 void scale(Matrix4* m, Vector3* v){
-    m->m[0][0] += v->x;
-    m->m[1][1] += v->y;
-    m->m[2][2] += v->z;
+    m->m[0][0] *= v->x;
+    m->m[1][1] *= v->y;
+    m->m[2][2] *= v->z;
 }
 
 void translate(Matrix4* m, Vector3* v){
