@@ -32,12 +32,11 @@ AudioSound generateAudioSoundFromWavFile(const s8* filename){
     u64 fileSize;
     loadDataFromFile(filename, &fileData, &fileSize);
     WavFile wf = loadWavFileData(fileData);
+    convertStereoToMonoWav(&wf);
 
     if(wf.numChannels == 1){
         if(wf.bitsPerSample == 8){
             alBufferData(as.bufferId, AL_FORMAT_MONO8, wf.data, wf.subChunk2Size, wf.sampleRate);
-        }else if(wf.bitsPerSample == 24){
-            alBufferData(as.bufferId, AL_FORMAT_MONO16, wf.data, ((f32)wf.subChunk2Size * 2.0) / 3.0, wf.sampleRate);
         }else{
             alBufferData(as.bufferId, AL_FORMAT_MONO16, wf.data, wf.subChunk2Size, wf.sampleRate);
         }
@@ -57,7 +56,7 @@ AudioSound generateAudioSoundFromWavFile(const s8* filename){
 }
 
 void updateAudioEmitterPosition(AudioEmitter* ae, Vector3* position){
-    alSource3f(ae->sourceId, AL_POSITION, position->x, position->y, position->z);
+    alSource3f(ae->sourceId, AL_POSITION, -position->x, -position->y, -position->z);
 }
 
 void setAudioLooping(AudioEmitter* ae, bool looping){

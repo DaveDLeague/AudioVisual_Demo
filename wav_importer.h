@@ -115,6 +115,29 @@ WavFile loadWavFileData(char* data){
     return wf;
 }
 
+void convertStereoToMonoWav(WavFile* wf){
+    wf->numChannels = 1;
+    u32 newSize = 0;
+    if(wf->bitsPerSample == 24){
+        newSize = (((float)wf->subChunk2Size * 2.0) / 3.0 )/ 2;
+    }else{
+        newSize = wf->subChunk2Size / 2;
+    }
+    
+    char* d = new char[newSize];
+    short* p = (short*)wf->data;
+    short* nd = (short*)d;
+    for(int i = 0; i < newSize / 2; i++){
+        short newValue = *p++ / 2;
+        newValue += *p++ / 2;
+        *nd = newValue;
+        nd++;
+    }
+    wf->subChunk2Size = newSize;
+    delete[] wf->data;
+    wf->data = d;
+}
+
 void freeWavFileData(WavFile wf){
     if(wf.data){
         delete[] wf.data;

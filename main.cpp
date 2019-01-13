@@ -53,19 +53,35 @@ int main(int argc, char** argv){
     createPerspectiveProjection(&camera, 70.0, (f32)WIDTH/(f32)HEIGHT, 0.001, 1000.0);
 
     initializePrimitive3DRenderer();
-    Cube cube = generateCube(&t);
-    Cube cube2 = generateCube(&t2); 
-    cube.position.y += 1;
-    cube2.position = vector3(0, 4, 0);
+    Cube cubes[2];
+    cubes[0] = generateCube(&t);
+    cubes[1] = generateCube(&t2); 
+    cubes[0].position = vector3(-15, 1, -20);
+    cubes[1].position = vector3(-0, 0, -0);
 
-    f32 cameraMoveSpeed = 0.1;
-    f32 cameraRotateSpeed = 0.01;
+    f32 cameraMoveSpeed = 10;
+    f32 cameraRotateSpeed = 1;
 
     initializeAudioManager();
-    AudioSound as = generateAudioSoundFromWavFile("../../symphony.wav");
-    AudioEmitter ae = generateAudioEmitterWithSound(&as);
-    setAudioLooping(&ae, true);
-    playAudio(&ae);
+    AudioSound song = generateAudioSoundFromWavFile("../../symphony.wav");
+    AudioSound bounce = generateAudioSoundFromWavFile("../../snare.wav");
+
+    AudioEmitter songEmitter = generateAudioEmitterWithSound(&song);
+    AudioEmitter bounceEmitter = generateAudioEmitterWithSound(&bounce);
+
+    setAudioLooping(&songEmitter, true);
+    playAudio(&songEmitter);
+
+    updateAudioEmitterPosition(&songEmitter, &cubes[0].position);
+    updateAudioEmitterPosition(&bounceEmitter, &cubes[1].position);
+    updateListenerPosition(&camera.position);
+
+    f32 deltaTime;
+    u64 startTime = getCurrentSystemTime();
+    u64 endTime;
+
+    f32 yVelocity = 0;
+    f32 gravity = 0.25;
 
     while(!win.closeRequested){
         updateWindowEvents(&win);
@@ -74,33 +90,43 @@ int main(int argc, char** argv){
         }
         clearColorAndDepthBuffer(); 
         
-        camera.position -= camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_W];
-        camera.position += camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_S];
-        camera.position += camera.right * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_A];
-        camera.position -= camera.right * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_D];
-        camera.position -= camera.up * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_R];
-        camera.position += camera.up * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_F];
-        rotate(&camera.orientation, camera.up, keyboardInputs[SDL_SCANCODE_RIGHT] * cameraRotateSpeed);
-        rotate(&camera.orientation, camera.up, keyboardInputs[SDL_SCANCODE_LEFT] * -cameraRotateSpeed);
-        rotate(&camera.orientation, camera.forward, keyboardInputs[SDL_SCANCODE_Q] * cameraRotateSpeed);
-        rotate(&camera.orientation, camera.forward, keyboardInputs[SDL_SCANCODE_E] * -cameraRotateSpeed);
-        rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_UP] * -cameraRotateSpeed);
-        rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_DOWN] * cameraRotateSpeed);
+        camera.position -= camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_W] * deltaTime;
+        camera.position += camera.forward * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_S] * deltaTime;
+        camera.position += camera.right * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_A] * deltaTime;
+        camera.position -= camera.right * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_D] * deltaTime;
+        camera.position -= camera.up * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_R] * deltaTime;
+        camera.position += camera.up * cameraMoveSpeed * keyboardInputs[SDL_SCANCODE_F] * deltaTime;
+        rotate(&camera.orientation, camera.up, keyboardInputs[SDL_SCANCODE_RIGHT] * cameraRotateSpeed * deltaTime);
+        rotate(&camera.orientation, camera.up, keyboardInputs[SDL_SCANCODE_LEFT] * -cameraRotateSpeed * deltaTime);
+        rotate(&camera.orientation, camera.forward, keyboardInputs[SDL_SCANCODE_Q] * cameraRotateSpeed * deltaTime);
+        rotate(&camera.orientation, camera.forward, keyboardInputs[SDL_SCANCODE_E] * -cameraRotateSpeed * deltaTime);
+        rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_UP] * -cameraRotateSpeed * deltaTime);
+        rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_DOWN] * cameraRotateSpeed * deltaTime);
 
-        cube.position.x -= 1;
+        cubes[1].position.y += yVelocity * deltaTime;
+        yVelocity -= gravity;
+        if(cubes[1].position.y <= 1){
+            cubes[1].position.y = 1;
+            updateAudioEmitterPosition(&bounceEmitter, &cubes[1].position);
+            playAudio(&bounceEmitter);
+            yVelocity = 100;
+        }
+
 
         updateCameraView(&camera);
 
         preparePrimitive3DRenderer();
     
-        renderCubes(&camera, &cube, 1);
-        renderCubes(&camera, &cube2, 1);
+        renderCubes(&camera, cubes, 2);
         renderGroundPlane(&camera, &t3, 100, 0);
         
-        updateAudioEmitterPosition(&ae, &cube.position);
+        updateAudioEmitterPosition(&songEmitter, &cubes[0].position);
         updateListenerPosition(&camera.position);
 
         swapWindowBuffer(&win);
+        endTime = getCurrentSystemTime();
+        deltaTime = ((f64)endTime - (f64)startTime) / 1000.0;
+        startTime = endTime;
     }
 
     deleteWindow(&win);
