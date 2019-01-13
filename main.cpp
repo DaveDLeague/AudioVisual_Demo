@@ -81,7 +81,7 @@ int main(int argc, char** argv){
     u64 endTime;
 
     f32 yVelocity = 0;
-    f32 gravity = 0.1;
+    f32 gravity = 50;
 
     while(!win.closeRequested){
         updateWindowEvents(&win);
@@ -103,13 +103,13 @@ int main(int argc, char** argv){
         rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_UP] * -cameraRotateSpeed * deltaTime);
         rotate(&camera.orientation, camera.right, keyboardInputs[SDL_SCANCODE_DOWN] * cameraRotateSpeed * deltaTime);
 
-        cubes[1].position.y += yVelocity * deltaTime;
-        yVelocity -= gravity;
+        cubes[1].position.y += yVelocity  * deltaTime;
+        yVelocity -= gravity * deltaTime;
         if(cubes[1].position.y <= 1){
             cubes[1].position.y = 1;
             updateAudioEmitterPosition(&bounceEmitter, &cubes[1].position);
             playAudio(&bounceEmitter);
-            yVelocity = 40;
+            yVelocity = 25;
         }
 
         updateCameraView(&camera);
