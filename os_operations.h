@@ -48,6 +48,10 @@ void deleteWindow(Window* win){
     SDL_DestroyWindow((SDL_Window*)win->window);
 }
 
+u64 getCurrentSystemTime(){
+    return SDL_GetTicks();
+}
+
 Window createWindow(const s8* title, u32 startX, u32 startY, u32 width, u32 height){
     Window win;
     win.window = (void*)SDL_CreateWindow("AV DEMO", startX, startY, width, height, SDL_WINDOW_OPENGL);

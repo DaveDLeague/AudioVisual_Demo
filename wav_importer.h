@@ -37,9 +37,9 @@ void printWaveFile(WavFile file){
     printf("Sub Chunk 2 Size: %u\n", file.subChunk2Size);
 
     printf("Data: \n");
-    for(int i = 0; i < file.subChunk2Size; i++){
-        printf("%i", file.data[i]);
-    }
+    // for(int i = 0; i < file.subChunk2Size; i++){
+    //     printf("%i", file.data[i]);
+    // }
 }
 
 WavFile loadWavFileData(char* data){
@@ -98,13 +98,15 @@ WavFile loadWavFileData(char* data){
     wf.data = new char[wf.subChunk2Size];
     if(wf.bitsPerSample == 24){
         char* iptr = fileptr;
-        for(int i = 0; i < wf.subChunk2Size / 3; i += 2){
+        u32 ctr = 0;
+        for(int i = 0; i < wf.subChunk2Size; i += 3){
             int num = *(int*)iptr / 256;
             iptr += 3;
-            wf.data[i] = num << 8;
-            wf.data[i + 1] = num >> 8;
+            wf.data[ctr++] = num << 8;
+            wf.data[ctr++] = num >> 8;
         }
     }else{
+        
         for(int i = 0; i < wf.subChunk2Size; i++){
             wf.data[i] = *fileptr++;
         }

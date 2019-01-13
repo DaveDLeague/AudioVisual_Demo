@@ -58,7 +58,6 @@ void renderCubes(Camera* cam, Cube* cubes, u32 totalCubes){
 
     for(u32 i = 0; i < totalCubes; i++){
         bindTexture(cubes[i].texture);
-        
         Matrix4 model = generateIdentityMatrix();
 
         translate(&model, &cubes[i].position);
