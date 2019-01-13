@@ -81,7 +81,7 @@ int main(int argc, char** argv){
     u64 endTime;
 
     f32 yVelocity = 0;
-    f32 gravity = 0.25;
+    f32 gravity = 0.1;
 
     while(!win.closeRequested){
         updateWindowEvents(&win);
@@ -109,9 +109,8 @@ int main(int argc, char** argv){
             cubes[1].position.y = 1;
             updateAudioEmitterPosition(&bounceEmitter, &cubes[1].position);
             playAudio(&bounceEmitter);
-            yVelocity = 100;
+            yVelocity = 40;
         }
-
 
         updateCameraView(&camera);
 
